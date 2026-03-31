@@ -1,0 +1,31 @@
+# 环境变量
+.env
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 数据目录（大文件或可重新生成）
+data/raw/
+data/processed/
+data/labeled/
+data/realtime/
+realtime/predictions.jsonl
+
+# 回测文件（可选）
+# results/backtest/*.png
+# results/backtest/*.csv
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 其他临时文件
+*.log
+*.tmp
+.DS_Store

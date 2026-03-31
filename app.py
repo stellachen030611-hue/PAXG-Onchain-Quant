@@ -1,12 +1,27 @@
 """
 app.py
-Streamlit 看板 - 量化因子与标注数据展示（最小化版本）
+Streamlit 看板 - 量化因子与标注数据展示（示例版本）
 """
-
-import streamlit as st
-import pandas as pd
-import plotly.express as px
 import os
+import pandas as pd
+import streamlit as st
+import plotly.express as px
+
+# 定义数据路径
+FULL_DATA_PATH = "data/labeled/full_labeled.parquet"
+SAMPLE_DATA_PATH = "data/sample/sample_labeled.parquet"
+
+# 加载数据
+if os.path.exists(FULL_DATA_PATH):
+    df = pd.read_parquet(FULL_DATA_PATH)
+    st.sidebar.success("✅ 使用完整标注数据集")
+else:
+    if os.path.exists(SAMPLE_DATA_PATH):
+        df = pd.read_parquet(SAMPLE_DATA_PATH)
+        st.sidebar.warning("📊 使用示例数据（50条），如需完整数据请运行脚本生成")
+    else:
+        st.error("未找到数据文件，请先运行脚本生成数据")
+        st.stop()
 
 # 页面配置
 st.set_page_config(page_title="PAXG 量化看板", layout="wide")
