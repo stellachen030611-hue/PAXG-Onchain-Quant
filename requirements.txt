@@ -1,0 +1,28 @@
+```txt
+# Core
+pandas>=1.5
+numpy>=1.24
+pyarrow>=12.0
+
+# Web3 & Data
+web3>=6.0
+yfinance>=0.2
+
+# Async & HTTP
+aiohttp>=3.9
+tqdm>=4.65
+
+# Machine Learning
+scikit-learn>=1.2
+xgboost>=1.7
+
+# Visualization
+streamlit>=1.28
+plotly>=5.14
+
+# Utilities
+python-dotenv>=1.0
+
+# Optional for advanced plotting
+matplotlib>=3.5
+seaborn>=0.12
