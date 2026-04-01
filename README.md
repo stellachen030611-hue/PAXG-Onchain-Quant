@@ -26,9 +26,6 @@ graph TD
     K --> O[Backtesting Module<br>backtest/run_backtest.py]
     O --> P[Equity Curve / Drawdown / Sharpe Ratio<br>results/backtest/]
 
-
-```markdown
-
 ## Key Features
 
 - On-chain data collection (Web3.py)
@@ -48,7 +45,8 @@ Python, Web3, Pandas, Scikit-learn, Streamlit, Ollama, etc.
 
 ## Project Directory Tree
 
-```
+```markdown
+```bash
 PAXG-Onchain-Quant/
 ├── data/                     # Data storage
 │   ├── raw/                  # Raw on-chain events, gold price CSV
@@ -83,7 +81,6 @@ PAXG-Onchain-Quant/
 ├── requirements.txt          # Python dependencies
 ├── .env                      # Environment variables (ETH_RPC_URL, etc.)
 └── README.md
-```
 
 ## Complete Data Generation Guide
 
