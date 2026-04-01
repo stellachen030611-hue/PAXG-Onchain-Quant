@@ -81,6 +81,7 @@ PAXG-Onchain-Quant/
 ├── requirements.txt          # Python dependencies
 ├── .env                      # Environment variables (ETH_RPC_URL, etc.)
 └── README.md
+```
 
 ## Complete Data Generation Guide
 
@@ -145,4 +146,3 @@ streamlit run app.py
 2. Run `streamlit run app.py` to see the pre-built dashboard.
 
 > Sample data is located at `data/sample/sample_labeled.parquet`; no need to run the full data generation process.
-```
