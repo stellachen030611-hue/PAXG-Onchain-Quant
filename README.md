@@ -1,133 +1,151 @@
-# PAXG Onchain Quant – 基于链上数据的黄金代币量化因子与 AI 策略
+# PAXG Onchain Quant – On-Chain Gold Token Quant Factor & AI Strategy
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
 ![Web3](https://img.shields.io/badge/Web3.py-6.0+-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-# 自动抓取 PAXG 转账事件，通过 LLM 初标+人工复核构建训练集，训练随机森林模型预测交易意图（accumulation/distribution/normal），并实现实时预测、回测验证、Streamlit 看板。
+Automatically fetch PAXG transfer events, use LLM initial labeling + manual review to build a training dataset, train a Random Forest model to predict transaction intent (accumulation/distribution/normal), and implement real-time prediction, backtesting validation, and a Streamlit dashboard.
 
-# 系统架构图：
+## System Architecture
 
 ```mermaid
 graph TD
-    A[以太坊主网] -->|Web3.py 轮询/WebSocket| B(PAXG Transfer 事件)
-    B --> C{数据流水线}
-    C --> D[原始数据存储<br>data/raw/]
-    D --> E[特征工程<br>3_preprocess_features.py]
-    E --> F[特征宽表<br>data/processed/]
-    G[黄金价格 API<br>yfinance/Stooq] --> E
-    F --> H[自动标注<br>7_auto_label.py + Ollama]
-    H --> I[标注数据集<br>data/labeled/]
-    I --> J[模型训练<br>8_factor_mining.py]
-    J --> K[随机森林模型<br>models/factor_model_intent.pkl]
-    K --> L[实时预测模块<br>realtime/run_realtime.py]
-    L --> M[实时预测结果<br>realtime/predictions.jsonl]
-    M --> N[Streamlit 看板<br>app.py]
-    K --> O[回测模块<br>backtest/run_backtest.py]
-    O --> P[权益曲线/回撤/夏普比率<br>results/backtest/]
+    A[Ethereum Mainnet] -->|Web3.py Polling/WebSocket| B(PAXG Transfer Event)
+    B --> C{Data Pipeline}
+    C --> D[Raw Data Storage<br>data/raw/]
+    D --> E[Feature Engineering<br>3_preprocess_features.py]
+    E --> F[Feature Table<br>data/processed/]
+    G[Gold Price API<br>yfinance/Stooq] --> E
+    F --> H[Auto Labeling<br>7_auto_label.py + Ollama]
+    H --> I[Labeled Dataset<br>data/labeled/]
+    I --> J[Model Training<br>8_factor_mining.py]
+    J --> K[Random Forest Model<br>models/factor_model_intent.pkl]
+    K --> L[Real-time Prediction Module<br>realtime/run_realtime.py]
+    L --> M[Real-time Predictions<br>realtime/predictions.jsonl]
+    M --> N[Streamlit Dashboard<br>app.py]
+    K --> O[Backtesting Module<br>backtest/run_backtest.py]
+    O --> P[Equity Curve / Drawdown / Sharpe Ratio<br>results/backtest/]
+
+
+```markdown
+
+## Key Features
+
+- On-chain data collection (Web3.py)
+- Feature engineering (balance, amount, time, gold price changes)
+- Auto labeling (Ollama + Gemma3)
+- Model training (Random Forest, output feature importance)
+- Real-time prediction (WebSocket listening, real-time decisions)
+- Backtesting engine (simulated trading, Sharpe ratio, etc.)
+- Visualization dashboard (Streamlit)
+- Quick start: environment setup, dependency installation, data acquisition, pipeline execution
+- Example results: feature importance chart, backtest equity curve, real-time prediction screenshots
+- Project structure: brief directory tree description
+
+## Tech Stack
+
+Python, Web3, Pandas, Scikit-learn, Streamlit, Ollama, etc.
+
+## Project Directory Tree
+
 ```
-
-# 主要功能：
-
-	链上数据采集（Web3.py）
-
-	特征工程（余额、金额、时间、黄金价格变化）
-
-	自动标注（Ollama + Gemma3）
-
-	模型训练（随机森林，输出特征重要性）
-
-	实时预测（WebSocket 监听，实时决策）
-
-	回测引擎（模拟交易，夏普比率等指标）
-
-	可视化看板（Streamlit）
-
-	快速开始：环境配置、安装依赖、数据获取、运行流水线等步骤。
-
-	结果示例：贴出特征重要性图、回测权益曲线、实时预测截图。
-
-	项目结构：简要说明目录树。
-
-# 技术栈：Python, Web3, Pandas, Scikit-learn, Streamlit, Ollama, etc.
-
-# 项目目录树：
-
 PAXG-Onchain-Quant/
-├── data/                     # 数据存储
-│   ├── raw/                  # 原始链上事件、黄金价格CSV
-│   ├── processed/            # 特征宽表（Parquet）、标注断点文件
-│   ├── labeled/              # 划分后的训练/验证/测试集
-│   ├── realtime/             # 实时预测记录（动态生成）
-│   └── sample/             # 最小单元示例
-├── scripts/                  # 数据处理流水线（按顺序执行）
+├── data/                     # Data storage
+│   ├── raw/                  # Raw on-chain events, gold price CSV
+│   ├── processed/            # Feature table (Parquet), labeling checkpoint files
+│   ├── labeled/              # Split train/val/test datasets
+│   ├── realtime/             # Real-time prediction records (generated on the fly)
+│   └── sample/               # Minimal sample data
+├── scripts/                  # Data processing pipeline (execute in order)
 │   ├── 1_fetch_paxg_transfers.py
 │   ├── 2_fetch_gold_price.py
 │   ├── 3_preprocess_features.py
 │   ├── 6_build_dataset.py
 │   ├── 7_auto_label.py
 │   └── 8_factor_mining.py
-├── realtime/                 # 实时预测模块
-│   ├── config.py             # RPC、模型路径、阈值配置
-│   ├── state_cache.py        # 地址余额、黄金价格缓存
-│   ├── feature_extractor.py  # 实时特征计算
-│   ├── predictor.py          # 加载模型、预测意图
-│   ├── stream_handler.py     # 保存预测结果到文件
-│   └── run_realtime.py       # 主入口：监听新区块并预测
-├── backtest/                 # 回测模块（策略验证）
-│   ├── config.py             # 回测参数（资金、费率、阈值）
-│   ├── signals.py            # 基于预测生成买卖信号
-│   ├── engine.py             # 模拟交易引擎
-│   ├── metrics.py            # 夏普比率、最大回撤等指标
-│   └── run_backtest.py       # 执行回测并输出结果
-├── models/                   # 训练好的模型
+├── realtime/                 # Real-time prediction module
+│   ├── config.py             # RPC, model path, threshold config
+│   ├── state_cache.py        # Address balance, gold price cache
+│   ├── feature_extractor.py  # Real-time feature computation
+│   ├── predictor.py          # Load model, predict intent
+│   ├── stream_handler.py     # Save prediction results to file
+│   └── run_realtime.py       # Main entry: listen to new blocks and predict
+├── backtest/                 # Backtesting module (strategy validation)
+│   ├── config.py             # Backtest parameters (capital, fee, thresholds)
+│   ├── signals.py            # Generate buy/sell signals based on predictions
+│   ├── engine.py             # Simulation trading engine
+│   ├── metrics.py            # Sharpe ratio, max drawdown, etc.
+│   └── run_backtest.py       # Execute backtest and output results
+├── models/                   # Trained models
 │   └── factor_model_intent.pkl
-├── results/backtest/         # 回测输出（图片、指标、交易明细）
-├── app.py                    # Streamlit 可视化看板
-├── requirements.txt          # Python 依赖
-├── .env                      # 环境变量（ETH_RPC_URL等）
+├── results/backtest/         # Backtest outputs (images, metrics, trade details)
+├── app.py                    # Streamlit visualization dashboard
+├── requirements.txt          # Python dependencies
+├── .env                      # Environment variables (ETH_RPC_URL, etc.)
 └── README.md
+```
 
-################### 完整数据生成指南 ###################
+## Complete Data Generation Guide
 
-# 1. 创建并激活环境
+### 1. Create and activate environment
+```bash
 conda create -n web3-gold python=3.10
 conda activate web3-gold
+```
 
-# 安装依赖
+### 2. Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
-# 创建 .env 文件，并填入以太坊节点 URL（例如 Infura/Alchemy）
-echo ETH_RPC_URL=https://mainnet.infura.io/v3/项目ID > .env
+### 3. Create `.env` file and fill in your Ethereum node URL (e.g., Infura/Alchemy)
+```bash
+echo ETH_RPC_URL=https://mainnet.infura.io/v3/YOUR_PROJECT_ID > .env
+```
 
-# 2. 配置 Ollama 本地模型
+### 4. Configure Ollama local model
+```bash
 ollama pull gemma3:4b
+```
 
-# 3. 数据采集与特征工程
-python scripts/1_fetch_paxg_transfers.py      # 从以太坊抓取 PAXG 转账（约 2.6 万条）
-python scripts/2_fetch_gold_price.py          # 下载黄金价格数据，如自动下载失败可手动下载
-python scripts/3_preprocess_features.py       # 特征工程，生成宽表
+### 5. Data collection & feature engineering
+```bash
+python scripts/1_fetch_paxg_transfers.py      # Fetch PAXG transfers from Ethereum (~26k events)
+python scripts/2_fetch_gold_price.py          # Download gold price data (manual download if auto fails)
+python scripts/3_preprocess_features.py       # Feature engineering, generate feature table
+```
 
-# 4. AI 自动标注（可选，也可使用已有标注）
-# 修改 scripts/7_auto_label.py 中的 SAMPLE_SIZE 为你想要的数量（如500，测试可设为SAMPLE_SIZE=10）
-python scripts/7_auto_label.py                # 调用 Ollama 进行标注（耗时数小时）
+### 6. AI auto labeling (optional, or use existing labels)
+- Modify `SAMPLE_SIZE` in `scripts/7_auto_label.py` to your desired number (e.g., 500; set to 10 for testing)
+```bash
+python scripts/7_auto_label.py                # Call Ollama for labeling (may take hours)
+```
 
-# 5. 构建数据集与训练模型
-python scripts/6_build_dataset.py             # 合并标注与特征
-python scripts/8_factor_mining.py             # 训练随机森林，输出特征重要性
+### 7. Build dataset & train model
+```bash
+python scripts/6_build_dataset.py             # Merge labels with features
+python scripts/8_factor_mining.py             # Train Random Forest, output feature importance
+```
 
-# 6. 回测验证（可选）
-python backtest/run_backtest.py       
+### 8. Backtesting (optional)
+```bash
+python backtest/run_backtest.py
+```
 
-# 7. 实时监控（可选）
-python realtime/run_realtime.py     
+### 9. Real-time monitoring (optional)
+```bash
+python realtime/run_realtime.py
+```
 
-# 8. 启动看板（将自动使用完整数据）
+### 10. Launch dashboard (will use the full dataset)
+```bash
 streamlit run app.py
+```
 
-################### 快速开始指南 ###################
+## Quick Start Guide
 
-1. 克隆仓库并安装依赖
-2. 运行 `streamlit run app.py` 即可看到预置看板
+1. Clone the repository and install dependencies.
+2. Run `streamlit run app.py` to see the pre-built dashboard.
 
-> 示例数据位于 `data/sample/sample_labeled.parquet`，无需运行完整数据生成流程。
+> Sample data is located at `data/sample/sample_labeled.parquet`; no need to run the full data generation process.
+```
