@@ -7,7 +7,6 @@
 Automatically fetch PAXG transfer events, use LLM initial labeling + manual review to build a training dataset, train a Random Forest model to predict transaction intent (accumulation/distribution/normal), and implement real-time prediction, backtesting validation, and a Streamlit dashboard.
 
 ## System Architecture
-
 ```mermaid
 graph TD
     A[Ethereum Mainnet] -->|Web3.py Polling/WebSocket| B(PAXG Transfer Event)
@@ -25,6 +24,7 @@ graph TD
     M --> N[Streamlit Dashboard<br>app.py]
     K --> O[Backtesting Module<br>backtest/run_backtest.py]
     O --> P[Equity Curve / Drawdown / Sharpe Ratio<br>results/backtest/]
+```
 
 ## Key Features
 
